@@ -81,7 +81,7 @@ class jankenpon : public eosio::contract
         eosio_assert(peer != host, "peer shouldn't be the same as host");
         game_index existing_host_games(_self, host);
         auto itr = existing_host_games.find(peer);
-        eosio_assert(itr != existing_host_games.end(), "game doesn't exists");
+        eosio_assert(itr != existing_host_games.end(), "game doesn't exist");
         existing_host_games.modify(itr, host, [&](auto &g) {
             eosio_assert((g.round == round), "invalid round");
             if (player == peer)
@@ -104,7 +104,7 @@ class jankenpon : public eosio::contract
         eosio_assert(peer != host, "peer shouldn't be the same as host");
         game_index existing_host_games(_self, host);
         auto itr = existing_host_games.find(peer);
-        eosio_assert(itr != existing_host_games.end(), "game doesn't exists");
+        eosio_assert(itr != existing_host_games.end(), "game doesn't exist");
         uint8_t play = ((uint8_t *)&secret)[31];
         eosio_assert((play >= 1 && play <= 3), "invalid play");
         existing_host_games.modify(itr, host, [&](auto &g) {
@@ -113,15 +113,15 @@ class jankenpon : public eosio::contract
             {
                 eosio_assert(!is_zero(g.peercommit), "peer hasn't committed");
                 eosio_assert(is_zero(g.peersecret), "peer already revealed");
-                g.peersecret = secret;
                 assert_sha256((char *)&secret, sizeof(secret), (const checksum256 *)&g.peercommit);
+                g.peersecret = secret;
             }
             else if (player == host)
             {
                 eosio_assert(!is_zero(g.hostcommit), "host hasn't committed");
                 eosio_assert(is_zero(g.hostsecret), "host already revealed");
-                g.hostsecret = secret;
                 assert_sha256((char *)&secret, sizeof(secret), (const checksum256 *)&g.hostcommit);
+                g.hostsecret = secret;
             }
             if (!is_zero(g.peersecret) && !is_zero(g.hostsecret))
             {
