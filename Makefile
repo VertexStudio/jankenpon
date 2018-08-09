@@ -1,6 +1,6 @@
-jankenpon: jankenpon/jankenpon.cpp
-	eosiocpp -o jankenpon/jankenpon.wast jankenpon/jankenpon.cpp
-	eosiocpp -g jankenpon/jankenpon.abi jankenpon/jankenpon.cpp
+jankenpon: jankenpon.cpp
+	eosiocpp -o jankenpon.wast jankenpon.cpp
+	eosiocpp -g jankenpon.abi jankenpon.cpp
 
 clean:
 	rm *.wasm *.wast

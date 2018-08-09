@@ -6,7 +6,7 @@ EOS_KEY=EOS8k4wDWyrq9yPUL17YKqThf5F5VVMs5c8diRZQfGKG9698dd6na
 # jankenpon account
 echo "\nCreating jankenpon account"
 cleos create account eosio jankenpon ${EOS_KEY} ${EOS_KEY}
-cleos set contract jankenpon jankenpon -p jankenpon
+cleos set contract jankenpon ../jankenpon -p jankenpon
 
 # Create players accounts
 echo "\nCreating players accounts"
