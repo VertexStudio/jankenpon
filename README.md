@@ -1,6 +1,6 @@
 # Jan-Ken-Pon (Rock-Paper-Scissors) - EOSIO Contract
 
-EOSIO contract example for playing jan-ken-pon.
+EOSIO contract for playing jan-ken-pon.
 
 ## Build:
 Get a working installation of EOS. Then `make` contracts.
