@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ##################################
 #
 #   Play a round
@@ -16,7 +17,7 @@ ROUND=$1
 
 echo "------------------------------------------------------------------------------"
 echo "BEFORE"
-cleos get table jankenpon player.rosa game
+cleos get table jankenpon player.rosa games
 
 echo "------------------------------------------------------------------------------"
 echo "player.rosa commit"
@@ -48,4 +49,4 @@ cleos push action jankenpon reveal '["player.jose", "player.rosa", "'"$ROUND"'",
 
 echo "------------------------------------------------------------------------------"
 echo "AFTER"
-cleos get table jankenpon player.rosa game
+cleos get table jankenpon player.rosa games
