@@ -45,7 +45,7 @@ class [[eosio::contract("jankenpon")]] Jankenpon : public eosio::contract
         capi_checksum256 hostcommit;
         capi_checksum256 peersecret;
         capi_checksum256 hostsecret;
-        auto primary_key() const { return peer; }
+        uint64_t primary_key() const { return peer; }
         EOSLIB_SERIALIZE(game, (peer)(host)(peerwins)(hostwins)(round)(peercommit)(hostcommit)(peersecret)(hostsecret))
     };
 
@@ -102,23 +102,28 @@ class [[eosio::contract("jankenpon")]] Jankenpon : public eosio::contract
     {
         require_auth(player);
         eosio_assert(peer != host, "peer shouldn't be the same as host");
+        
         game_index existing_host_games(_self, host.value);
         auto itr = existing_host_games.find(peer.value);
         eosio_assert(itr != existing_host_games.end(), "game doesn't exist");
+        
         uint8_t play = ((uint8_t *)&secret)[31];
         eosio_assert((play >= 1 && play <= 3), "invalid play");
         existing_host_games.modify(itr, host, [&](auto &g) {
+
+            eosio_assert(!is_zero(g.hostcommit), "host hasn't committed");
+            eosio_assert(!is_zero(g.peercommit), "peer hasn't committed");
+
             eosio_assert((g.round == round), "invalid round");
             if (player == peer)
             {
-                eosio_assert(!is_zero(g.peercommit), "peer hasn't committed");
                 eosio_assert(is_zero(g.peersecret), "peer already revealed");
                 assert_sha256((char *)&secret, sizeof(secret), (const capi_checksum256 *)&g.peercommit);
                 g.peersecret = secret;
             }
             else if (player == host)
             {
-                eosio_assert(!is_zero(g.hostcommit), "host hasn't committed");
+                
                 eosio_assert(is_zero(g.hostsecret), "host already revealed");
                 assert_sha256((char *)&secret, sizeof(secret), (const capi_checksum256 *)&g.hostcommit);
                 g.hostsecret = secret;
@@ -137,6 +142,23 @@ class [[eosio::contract("jankenpon")]] Jankenpon : public eosio::contract
             }
         });
     }
+
+    [[eosio::action]] 
+    void endgame(const name &peer, const name &host) 
+    {
+        require_auth(host);
+        eosio_assert(peer != host, "peer shouldn't be the same as host");
+        
+        game_index existing_host_games(_self, host.value);
+        auto itr = existing_host_games.find(peer.value);
+
+        eosio_assert(itr != existing_host_games.end(), "game doesn't exist");
+
+        eosio_assert(is_zero((*itr).hostcommit), "host has committed. Round isn't over yet! Reveal is required!");
+        eosio_assert(is_zero((*itr).peercommit), "peer has committed. Round isn't over yet! Reveal is required!");
+
+        existing_host_games.erase(itr);
+    }
 };
 
-EOSIO_DISPATCH(Jankenpon, (create)(commit)(reveal))
+EOSIO_DISPATCH(Jankenpon, (create)(commit)(reveal)(endgame))
